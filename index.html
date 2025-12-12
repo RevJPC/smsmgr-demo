@@ -659,12 +659,11 @@
                     🔄 Sync History to Cloud
                 </button>
             </div>
+            <button onclick="saveSettings()"
+                class="w-full mt-6 px-6 py-3 bg-primary text-white rounded-xl font-semibold hover-primary">
+                Save Settings
+            </button>
         </div>
-        <button onclick="saveSettings()"
-            class="w-full mt-6 px-6 py-3 bg-primary text-white rounded-xl font-semibold hover-primary">
-            Save Settings
-        </button>
-    </div>
     </div>
 
     <!-- Bulk Message Modal -->
@@ -3890,6 +3889,13 @@
             window.saveCachedConversations = () => console.log('🛑 Chat save disabled in Demo');
             window.saveAdHocContacts = () => console.log('🛑 Contact save disabled in Demo');
 
+            // Mock saveSettings for demo - don't require Twilio fields
+            window.saveSettings = function () {
+                console.log('🛑 Settings save mocked in Demo');
+                alert('✅ Settings saved! (Demo mode)');
+                closeSettings();
+            };
+
             // 7. Speed up polling for demo
             // Clear existing interval if any (hard to capture global ID, so we just start a faster one that overlaps)
             // But we can overwrite pollMessages to be instant for the demo interaction
@@ -3942,10 +3948,9 @@
             const originalGetItem = Storage.prototype.getItem;
 
             Storage.prototype.setItem = function (key, value) {
-                if (key === 'notificationSound') {
-                    console.log('🔊 (Mock) Saving sound pref:', value);
-                    // We allow saving sound pref to session for this demo run only?
-                    // Better to just map it to a memory object for true isolation
+                // Allow certain keys to be stored in demo memory
+                if (['notificationSound', 'auth', 'colorTheme'].includes(key)) {
+                    console.log(`🔊 (Mock) Saving ${key}:`, value);
                     window._demoStorage = window._demoStorage || {};
                     window._demoStorage[key] = value;
                     return;
